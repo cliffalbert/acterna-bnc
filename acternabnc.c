@@ -36,9 +36,10 @@ int s; /*socketdescriptor*/
 
 struct sockaddr_storage peer_addr;
 socklen_t peer_addr_len;
+ssize_t returnsendto;
 
-unsigned char* buffer = (unsigned char*)malloc(MAXFRAME_SIZE);
 unsigned char* sbuffer = (unsigned char*)malloc(SND_FRAME_LEN);
+unsigned char* buffer = (unsigned char*)malloc(MAXFRAME_SIZE);
 
 int length = 0; /*length of the received frame*/
 
@@ -55,7 +56,7 @@ printf ("Release: August 12th 2011\n");
 
 if (argc != 2) {
 printf ("Usage: acternabnc <ip remote unit>\n");
-exit(20);
+exit(EXIT_FAILURE);
 }
 
 printf ("Remote Tester IP: %s \n",argv[1]);
@@ -65,6 +66,7 @@ s = socket(AF_INET, SOCK_RAW, 0xFE);
 if (s == -1) { printf("ERROR BINDING SOCKET...\n"); exit(0); }
 
 memset(buffer, '\0', MAXFRAME_SIZE);
+memset(sbuffer, '\0', SND_FRAME_LEN);
 
 memset((char *) &si_other, 0, sizeof(si_other));
 si_other.sin_family = AF_INET;
@@ -83,7 +85,7 @@ while(1){
 
 	sbuffer = buffer+20;
 
-	sendto(s, sbuffer, length - 20, 0, (struct sockaddr *) &si_other, slen);
+	returnsendto = sendto(s, sbuffer, length - 20, 0, (struct sockaddr *) &si_other, slen);
 
 	memset(buffer, '\0', MAXFRAME_SIZE);
 
